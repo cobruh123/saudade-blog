@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>{{ post.title }} | Saudade Blog</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', path='css/styles.css') }}"
+    >
+</head>
+
+<body>
+
+{% include "partials/header.html" %}
+
+
+<main class="post-page">
+
+    <article class="full-post">
+
+        <img
+            class="full-post-image"
+            src="{{ post.image }}"
+            alt="{{ post.title }}"
+        >
+
+        <div class="full-post-content">
+
+            <div class="reader-meta">
+                {{ post.category }}
+                |
+                {{ post.created_at.strftime('%B %d, %Y') }}
+            </div>
+
+            <h1>
+                {{ post.title }}
+            </h1>
+
+            <p class="full-post-excerpt">
+                {{ post.excerpt }}
+            </p>
+
+            <div class="full-post-body">
+                {{ post.body | format_post_body }}
+
+            </div>
+
+            <section class="show_comments">
+                <h2>
+                    Comments
+                </h2>
+
+
+                {% if comments %}
+
+                    <div class="comments-list">
+
+                        {% for comment in comments %}
+
+                            <article class="comment">
+
+                                <div class="comment-header">
+
+                                    <strong>
+                                        {{ comment.author_name }}
+                                    </strong>
+
+                                    <time>
+                                        {{ comment.created_at.strftime('%B %d, %Y') }}
+                                    </time>
+
+                                </div>
+
+
+                                <p>
+                                    {{ comment.content }}
+                                </p>
+
+                            </article>
+
+                        {% endfor %}
+
+                    </div>
+
+                {% else %}
+
+                    <p class="no-comments">
+                        No comments yet. Be the first to comment.
+                    </p>
+
+                {% endif %}
+
+            </section>
+
+            <section class="comment-form-section">
+
+                <h3>
+                    Leave a comment
+                </h3>
+
+
+                <form
+                    action="/blog/{{ post.id }}/comments"
+                    method="post"
+                    class="comment-form"
+                >
+
+                    <input
+                        type="text"
+                        name="author_name"
+                        placeholder="Your name"
+                        required
+                    >
+
+
+                    <textarea
+                        name="content"
+                        placeholder="Write your comment..."
+                        rows="5"
+                        required
+                    ></textarea>
+
+
+                    <button
+                        type="submit"
+                        class="button"
+                    >
+                        Post comment
+                    </button>
+
+                </form>
+
+            </section>
+
+        </div>
+
+    </article>
+
+    
+
+</main>
+
+{% include "partials/footer.html" %}
+
+</body>
+
+</html>

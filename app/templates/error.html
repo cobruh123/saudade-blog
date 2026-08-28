@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{{ status_code }} — Adeka's Blog</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', path='css/styles.css') }}"
+    >
+
+</head>
+
+<body>
+
+<div class="error-page">
+    <div class="error-box">
+
+        <h1 class="error-code">Error {{ status_code }}</h1>
+
+        <p class="error-message">
+            {{ detail }}
+        </p>
+
+        <a href="/" class="home-button">
+            Go back home
+        </a>
+
+    </div>
+</div>
+
+</body>
+</html>

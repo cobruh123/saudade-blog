@@ -1,0 +1,8 @@
+<header class="site-header">
+    <a class="logo" href="/">Saudade Blog</a>
+    <nav aria-label="Primary navigation">
+        <a class="{% if request.url.path == '/' %}active{% endif %}" href="/">Home</a>
+        <a class="{% if request.url.path == '/blog' or request.url.path.startswith('/blog/') %}active{% endif %}" href="/blog">Blogs</a>
+        <a href="/#about">About</a>
+    </nav>
+</header>

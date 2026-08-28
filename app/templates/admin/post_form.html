@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if post %}Edit post{% else %}New post{% endif %} | Saudade Blog</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='css/styles.css') }}">
+</head>
+<body>
+    <header class="site-header">
+        <a class="logo" href="/">Saudade Blog</a>
+        <nav class="admin-nav" aria-label="Admin navigation">
+            <a href="/admin">Back to posts</a>
+            <form action="/admin/logout" method="post">
+                <button class="header-button" type="submit">Log out</button>
+            </form>
+        </nav>
+    </header>
+
+    <main class="section panel-section">
+        <div class="section-heading">
+            <p class="eyebrow">Writer panel</p>
+            <h1>{% if post %}Edit post{% else %}Create a new post{% endif %}</h1>
+        </div>
+
+        <form class="editor-form" action="{% if post %}/admin/posts/{{ post.id }}/edit{% else %}/admin/posts/create{% endif %}" method="post" enctype="multipart/form-data">
+            <div class="form-row">
+                <label for="title">Title</label>
+                <input id="title" name="title" type="text" value="{{ post.title if post else '' }}" required>
+            </div>
+            <div class="form-row">
+                <label for="category">Category</label>
+                <select id="category" name="category" required>
+                    {% for category in categories %}
+                    <option value="{{ category }}" {% if (post and post.category == category) or (not post and category == 'Thoughts') %}selected{% endif %}>{{ category }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-row">
+                <label for="excerpt">Short description</label>
+                <input id="excerpt" name="excerpt" type="text" value="{{ post.excerpt if post else '' }}" required>
+            </div>
+            <div class="form-row">
+                <label for="body">Content</label>
+                <div class="formatting-toolbar" role="toolbar" aria-label="Text formatting">
+                    <button type="button" data-action="heading">Heading</button>
+                    <button type="button" data-action="bold"><strong>Bold</strong></button>
+                    <button type="button" data-action="italic"><em>Italic</em></button>
+                    <button type="button" data-action="link">Link</button>
+                    <button type="button" data-action="quote">Quote</button>
+                    <button type="button" data-action="list">Bullets</button>
+                    <button type="button" data-action="inline-image">Insert image</button>
+                    <button type="button" data-action="divider">Divider</button>
+                </div>
+                <input id="inline_image_upload" class="visually-hidden" type="file" accept="image/jpeg,image/png,image/webp">
+                <p id="inline-upload-status" class="field-hint" role="status">Select text, then choose a format. Insert image uploads a file and places it at the cursor.</p>
+                <textarea id="body" name="body" rows="14" required>{{ post.body if post else '' }}</textarea>
+            </div>
+            <div class="form-row">
+                <label for="image">Cover image path <span class="field-hint">(optional)</span></label>
+                <input id="image" name="image" type="text" value="{{ post.image if post else '' }}" placeholder="/static/images/blog1.jpg">
+            </div>
+            <div class="form-row image-upload-panel">
+                <label for="cover_upload">Upload a new cover image <span class="field-hint">(JPG, PNG, or WebP; max 5 MB)</span></label>
+                <input id="cover_upload" name="cover_upload" type="file" accept="image/jpeg,image/png,image/webp">
+            </div>
+            <div class="form-actions">
+                <a class="text-button" href="/admin">Cancel</a>
+                <button class="button" type="submit">{% if post %}Save changes{% else %}Publish post{% endif %}</button>
+            </div>
+        </form>
+    </main>
+    <script>
+        const editor = document.querySelector('#body');
+        const toolbar = document.querySelector('.formatting-toolbar');
+        const inlineImageUpload = document.querySelector('#inline_image_upload');
+        const inlineUploadStatus = document.querySelector('#inline-upload-status');
+        let selectionStart = 0;
+        let selectionEnd = 0;
+
+        function rememberSelection() {
+            selectionStart = editor.selectionStart;
+            selectionEnd = editor.selectionEnd;
+        }
+
+        ['click', 'keyup', 'select'].forEach((eventName) => {
+            editor.addEventListener(eventName, rememberSelection);
+        });
+
+        function replaceSelection(prefix, suffix = '', placeholder = 'text') {
+            const start = editor.selectionStart;
+            const end = editor.selectionEnd;
+            const selected = editor.value.slice(start, end) || placeholder;
+            editor.setRangeText(prefix + selected + suffix, start, end, 'end');
+            editor.focus();
+        }
+
+        toolbar.addEventListener('click', (event) => {
+            const action = event.target.closest('button')?.dataset.action;
+            if (!action) return;
+
+            if (action === 'heading') replaceSelection('## ', '', 'Section heading');
+            if (action === 'bold') replaceSelection('**', '**', 'bold text');
+            if (action === 'italic') replaceSelection('*', '*', 'italic text');
+            if (action === 'link') replaceSelection('[', '](https://)', 'link text');
+            if (action === 'quote') replaceSelection('> ', '', 'Quote');
+            if (action === 'list') replaceSelection('- ', '', 'List item');
+            if (action === 'inline-image') {
+                rememberSelection();
+                inlineImageUpload.click();
+            }
+            if (action === 'divider') replaceSelection('\n---\n', '', '');
+        });
+
+        inlineImageUpload.addEventListener('change', async () => {
+            const image = inlineImageUpload.files[0];
+            if (!image) return;
+
+            const formData = new FormData();
+            formData.append('image', image);
+            inlineUploadStatus.textContent = 'Uploading image…';
+
+            try {
+                const response = await fetch('/admin/uploads/inline', { method: 'POST', body: formData });
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.detail || 'Upload failed');
+
+                editor.setRangeText(`\n![Image](${result.image_path})\n`, selectionStart, selectionEnd, 'end');
+                editor.focus();
+                rememberSelection();
+                inlineUploadStatus.textContent = 'Image inserted. Replace “Image” with a caption if you like.';
+            } catch (error) {
+                inlineUploadStatus.textContent = error.message;
+            } finally {
+                inlineImageUpload.value = '';
+            }
+        });
+    </script>
+</body>
+</html>

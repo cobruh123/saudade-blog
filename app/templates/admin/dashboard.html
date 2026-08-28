@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Saudade Blog</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='css/styles.css') }}">
+</head>
+<body>
+    <header class="site-header">
+        <a class="logo" href="/">Saudade Blog</a>
+        <nav class="admin-nav" aria-label="Admin navigation">
+            <a href="/admin/posts/new">Write a post</a>
+            <form action="/admin/logout" method="post">
+                <button class="header-button" type="submit">Log out</button>
+            </form>
+        </nav>
+    </header>
+
+    <main class="section admin-section">
+        <div class="section-heading admin-heading">
+            <div>
+                <p class="eyebrow">Writer panel</p>
+                <h1>Your posts</h1>
+            </div>
+            <a class="button" href="/admin/posts/new">Create post</a>
+        </div>
+
+        {% if message %}
+        <p class="admin-message" role="status">{{ message }}</p>
+        {% endif %}
+
+        {% if posts %}
+        <div class="admin-post-list">
+            {% for post in posts %}
+            <article class="admin-post-row">
+                <div>
+                    <p class="admin-post-meta">{{ post.category }} · {{ post.created_at.strftime('%B %d, %Y') }}</p>
+                    <h2>{{ post.title }}</h2>
+                    <p>{{ post.excerpt }}</p>
+                </div>
+                <div class="admin-actions">
+                    <a class="text-button" href="/blog/{{ post.id }}">View</a>
+                    <a class="text-button" href="/admin/posts/{{ post.id }}/edit">Edit</a>
+                    <form action="/admin/posts/{{ post.id }}/delete" method="post" onsubmit="return confirm('Delete this post and its comments?');">
+                        <button class="text-button danger-button" type="submit">Delete</button>
+                    </form>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <section class="admin-empty-state">
+            <h2>Your blog is ready for its first post.</h2>
+            <p>Write something worth returning to.</p>
+            <a class="button" href="/admin/posts/new">Create your first post</a>
+        </section>
+        {% endif %}
+    </main>
+</body>
+</html>

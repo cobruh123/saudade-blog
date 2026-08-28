@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Writer Panel</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', path='css/styles.css') }}"
+    >
+</head>
+
+<body>
+
+<header class="site-header">
+    <a class="logo" href="/">
+        Saudade Blog
+    </a>
+</header>
+
+<main class="section panel-section">
+
+    <div class="section-heading">
+        <p class="eyebrow">Writer panel</p>
+        <h1>Create a new post</h1>
+    </div>
+
+    <form
+        class="editor-form"
+        action="/admin/posts/create"
+        method="post"
+    >
+
+        <div class="form-row">
+
+            <label for="title">
+                Title
+            </label>
+
+            <input
+                id="title"
+                name="title"
+                type="text"
+                placeholder="Post title"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-row">
+
+            <label for="category">
+                Category
+            </label>
+
+            <input
+                id="category"
+                name="category"
+                type="text"
+                placeholder="Thoughts"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-row">
+
+            <label for="excerpt">
+                Short description
+            </label>
+
+            <input
+                id="excerpt"
+                name="excerpt"
+                type="text"
+                placeholder="Short description"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-row">
+
+            <label for="body">
+                Content
+            </label>
+
+            <textarea
+                id="body"
+                name="body"
+                rows="12"
+                placeholder="Write your post..."
+                required
+            ></textarea>
+
+        </div>
+
+
+        <div class="form-row">
+
+            <label for="image">
+                Image path
+            </label>
+
+            <input
+                id="image"
+                name="image"
+                type="text"
+                placeholder="/static/images/blog1.jpg"
+            >
+
+        </div>
+
+
+        <button
+            class="button"
+            type="submit"
+        >
+            Publish post
+        </button>
+
+    </form>
+
+</main>
+
+</body>
+</html>

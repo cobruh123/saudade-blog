@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saudade Blog</title>
+    <!-- <link rel="stylesheet" href="../static/css/styles.css"> -->
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', path='css/styles.css') }}"
+    >
+
+</head>
+<body>
+    {% include "partials/header.html" %}
+
+    <main>
+        <section id="home" class="hero">
+            <video class="hero-video" autoplay muted loop playsinline>
+                <source src="../static/images/grass-back.mp4" type="video/mp4">
+            </video>
+            <div class="hero-copy">
+                <p class="eyebrow">Personal notes, lessons, and quiet discoveries</p>
+                <h1>Explore, learn, and keep becoming.</h1>
+                <p>Read the newest essays, save your own drafts from the panel, and let visitors join the conversation in the comments.</p>
+                <a class="button" href="#blog">Read latest posts</a>
+            </div>
+        </section>
+        
+        <!-- Latest Posts -->
+
+        <section id="blog" class="section blog-section">
+            <div class="section-heading">
+                <p class="eyebrow">Latest posts</p>
+                <h2>Fresh from the notebook</h2>
+            </div>
+
+            <div id="postList" class="blog-grid" aria-live="polite">
+                {% for post in posts %}
+
+                <article class="blog-card">
+
+                    <img
+                        src="{{ post.image }}"
+                        alt="{{ post.title }}"
+                    >
+
+                    <div class="blog-info">
+
+                        <small>
+                            {{ post.category }}
+                        </small>
+
+                        <h3>
+                            {{ post.title }}
+                        </h3>
+
+                        <p>
+                            {{ post.excerpt }}
+                        </p>
+
+                        <a
+                            class="text-button"
+                            href="/blog/{{ post.id }}"
+                        >
+                            Read post
+                        </a>
+
+                    </div>
+
+                </article>
+
+                {% endfor %}
+
+            </div>
+
+        </section>
+
+        <section id="reader" class="section reader-section" hidden>
+            <article class="reader-post">
+                <button id="closeReader" class="ghost-button" type="button">Back to all posts</button>
+                <img id="readerImage" src="" alt="">
+                <div class="reader-meta" id="readerMeta"></div>
+                <h2 id="readerTitle"></h2>
+                <p id="readerExcerpt"></p>
+                <div id="readerBody" class="reader-body"></div>
+            </article>
+
+            <aside class="comments-panel">
+                <h3>Comments</h3>
+                <div id="commentList" class="comment-list"></div>
+                <form id="commentForm" class="comment-form">
+                    <label for="commentName">Name</label>
+                    <input id="commentName" name="name" type="text" maxlength="40" placeholder="Your name" required>
+
+                    <label for="commentText">Comment</label>
+                    <textarea id="commentText" name="comment" rows="4" maxlength="500" placeholder="Share a thought" required></textarea>
+
+                    <button class="button" type="submit">Leave comment</button>
+                </form>
+            </aside>
+        </section>
+
+        <!-- <section id="panel" class="section panel-section">
+            <div class="section-heading">
+                <p class="eyebrow">Writer panel</p>
+                <h2>Create a new blog post</h2>
+            </div>
+
+            <form id="loginForm" class="editor-form login-form">
+                <div class="form-row">
+                    <label for="panelPassword">Author passcode</label>
+                    <input id="panelPassword" name="password" type="password" placeholder="Enter passcode" required>
+                    <p id="loginMessage" class="form-message" aria-live="polite"></p>
+                </div>
+                <button class="button" type="submit">Unlock panel</button>
+            </form>
+
+            <form id="postForm" class="editor-form" hidden>
+                <div class="form-row">
+                    <label for="postTitle">Title</label>
+                    <input id="postTitle" name="title" type="text" maxlength="90" placeholder="A thoughtful title" required>
+                </div>
+
+                <div class="form-row two-columns">
+                    <div>
+                        <label for="postCategory">Category</label>
+                        <input id="postCategory" name="category" type="text" maxlength="35" placeholder="Thoughts" required>
+                    </div>
+                    <div>
+                        <label for="postImage">Cover image</label>
+                        <select id="postImage" name="image">
+                            <option value="../static/images/blog1.jpg">Forest figure</option>
+                            <option value="../static/images/blog2.jpg">Red portrait</option>
+                            <option value="../static/images/blog3.jpg">Open road</option>
+                            <option value="../static/images/back1.png">Green landscape</option>
+                            <option value="../static/images/back2.png">Seasonal scene</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <label for="postExcerpt">Short description</label>
+                    <input id="postExcerpt" name="excerpt" type="text" maxlength="150" placeholder="A one-line preview for readers" required>
+                </div>
+
+                <div class="form-row">
+                    <label for="postBody">Post content</label>
+                    <textarea id="postBody" name="body" rows="9" placeholder="Write your blog post here..." required></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button class="button" type="submit">Publish post</button>
+                    <button id="resetPosts" class="ghost-button danger" type="button">Reset demo posts</button>
+                </div>
+            </form>
+        </section> -->
+
+        <section id="about" class="section split-section">
+            <div>
+                <p class="eyebrow">About</p>
+                <h2>A place for honest progress</h2>
+            </div>
+            <p>This blog is built for small essays, lessons, memories, and reflections. Visitors can read every post and leave comments. In the era of AI, it's more important than ever to seek out authentic voices and genuine human perspectives.</p>
+        </section>
+
+    </main>
+
+    {% include "partials/footer.html" %}
+
+    <script>
+        // const STORAGE_KEY = "saudade-posts";
+        // const COMMENT_KEY = "saudade-comments";
+        const AUTHOR_PASSCODE = "saudade";
+        const AUTHOR_SESSION_KEY = "saudade-author-unlocked";
+
+        
+
+        const postList = document.querySelector("#postList");
+        const loginForm = document.querySelector("#loginForm");
+        const loginMessage = document.querySelector("#loginMessage");
+        const postForm = document.querySelector("#postForm");
+        const resetPosts = document.querySelector("#resetPosts");
+        const template = document.querySelector("#postCardTemplate");
+        const reader = document.querySelector("#reader");
+        const closeReader = document.querySelector("#closeReader");
+        const commentForm = document.querySelector("#commentForm");
+        let activePostId = null;
+
+
+        function getComments() {
+            const saved = localStorage.getItem(COMMENT_KEY);
+            return saved ? JSON.parse(saved) : {};
+        }
+
+        function saveComments(comments) {
+            localStorage.setItem(COMMENT_KEY, JSON.stringify(comments));
+        }
+
+        function formatDate(dateString) {
+            return new Intl.DateTimeFormat("en", { month: "short", day: "numeric", year: "numeric" }).format(new Date(dateString));
+        }
+
+        function escapeHTML(value) {
+            return value.replace(/[&<>"']/g, (character) => {
+                const entities = {
+                    "&": "&amp;",
+                    "<": "&lt;",
+                    ">": "&gt;",
+                    '"': "&quot;",
+                    "'": "&#039;"
+                };
+                return entities[character];
+            });
+        }
+
+        function updatePanelState() {
+            const isUnlocked = sessionStorage.getItem(AUTHOR_SESSION_KEY) === "true";
+            loginForm.hidden = isUnlocked;
+            postForm.hidden = !isUnlocked;
+        }
+
+        function renderPosts() {
+            const posts = getPosts().sort((a, b) => new Date(b.date) - new Date(a.date));
+            postList.innerHTML = "";
+
+            posts.forEach((post) => {
+                const card = template.content.cloneNode(true);
+                const image = card.querySelector("img");
+                image.src = post.image;
+                image.alt = post.title;
+                card.querySelector("small").textContent = `${post.category} | ${formatDate(post.date)}`;
+                card.querySelector("h3").textContent = post.title;
+                card.querySelector("p").textContent = post.excerpt;
+                card.querySelector("button").addEventListener("click", () => openPost(post.id));
+                postList.appendChild(card);
+            });
+        }
+
+        function openPost(postId) {
+            const post = getPosts().find((item) => item.id === postId);
+            if (!post) return;
+
+            activePostId = post.id;
+            document.querySelector("#readerImage").src = post.image;
+            document.querySelector("#readerImage").alt = post.title;
+            document.querySelector("#readerMeta").textContent = `${post.category} | ${formatDate(post.date)}`;
+            document.querySelector("#readerTitle").textContent = post.title;
+            document.querySelector("#readerExcerpt").textContent = post.excerpt;
+            document.querySelector("#readerBody").innerHTML = post.body
+                .split(/\n+/)
+                .filter(Boolean)
+                .map((paragraph) => `<p>${escapeHTML(paragraph)}</p>`)
+                .join("");
+
+            reader.hidden = false;
+            renderComments();
+            reader.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+
+        function renderComments() {
+            const list = document.querySelector("#commentList");
+            const comments = getComments()[activePostId] || [];
+            list.innerHTML = comments.length ? "" : "<p class='empty-state'>No comments yet. Be the first voice here.</p>";
+
+            comments.forEach((comment) => {
+                const item = document.createElement("article");
+                item.className = "comment";
+                item.innerHTML = `
+                    <strong>${escapeHTML(comment.name)}</strong>
+                    <span>${formatDate(comment.date)}</span>
+                    <p>${escapeHTML(comment.text)}</p>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        loginForm.addEventListener("submit", (event) => {
+            event.preventDefault();
+            const formData = new FormData(loginForm);
+            const passcode = formData.get("password").trim();
+
+            if (passcode !== AUTHOR_PASSCODE) {
+                loginMessage.textContent = "That passcode did not work.";
+                return;
+            }
+
+            sessionStorage.setItem(AUTHOR_SESSION_KEY, "true");
+            loginForm.reset();
+            loginMessage.textContent = "";
+            updatePanelState();
+        });
+
+        postForm.addEventListener("submit", (event) => {
+            event.preventDefault();
+            const formData = new FormData(postForm);
+            const posts = getPosts();
+            const post = {
+                id: `post-${Date.now()}`,
+                title: formData.get("title").trim(),
+                category: formData.get("category").trim(),
+                date: new Date().toISOString().slice(0, 10),
+                excerpt: formData.get("excerpt").trim(),
+                body: formData.get("body").trim(),
+                image: formData.get("image")
+            };
+
+            savePosts([post, ...posts]);
+            postForm.reset();
+            
+            openPost(post.id);
+        });
+
+        commentForm.addEventListener("submit", (event) => {
+            event.preventDefault();
+            if (!activePostId) return;
+
+            const formData = new FormData(commentForm);
+            const comments = getComments();
+            const postComments = comments[activePostId] || [];
+            postComments.push({
+                name: formData.get("name").trim(),
+                text: formData.get("comment").trim(),
+                date: new Date().toISOString().slice(0, 10)
+            });
+            comments[activePostId] = postComments;
+            saveComments(comments);
+            commentForm.reset();
+            renderComments();
+        });
+
+        closeReader.addEventListener("click", () => {
+            reader.hidden = true;
+            activePostId = null;
+            document.querySelector("#blog").scrollIntoView({ behavior: "smooth" });
+        });
+
+        resetPosts.addEventListener("click", () => {
+            localStorage.removeItem(STORAGE_KEY);
+            localStorage.removeItem(COMMENT_KEY);
+            reader.hidden = true;
+            renderPosts();
+        });
+
+        updatePanelState();
+        renderPosts();
+    </script>
+</body>
+</html>
