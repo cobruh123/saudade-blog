@@ -7,3 +7,4 @@ blog.db
 /app/__pycache__
 /app/static/uploads
 /app/test.py
+/app/static/images/grass-back.mp4
