@@ -1,0 +1,9 @@
+
+/.venv
+/.vscode
+log_pass.txt
+create_admin.py
+blog.db
+/app/__pycache__
+/app/static/uploads
+/app/test.py
