@@ -2,6 +2,7 @@ import re
 import os
 import secrets
 import warnings
+from dotenv import load_dotenv
 from html import escape
 
 from fastapi import FastAPI, Request, Form, HTTPException
@@ -18,6 +19,8 @@ from .categories import BLOG_CATEGORIES
 from .models import Post, Comment
 from .admin import router as admin_router
 
+load_dotenv()
+print(os.getenv("SESSION_SECRET"))
 app = FastAPI()
 Base.metadata.create_all(bind=engine)
 session_secret = os.getenv("SESSION_SECRET")

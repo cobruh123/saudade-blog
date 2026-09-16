@@ -8,3 +8,4 @@ blog.db
 /app/static/uploads
 /app/test.py
 /app/static/images/grass-back.mp4
+.env
